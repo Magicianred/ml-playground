@@ -9,8 +9,6 @@ import {
   setResultsPhase
 } from "../redux";
 import { styles } from "../constants";
-import aiBotHead from "@public/images/ai-bot/ai-bot-head.png";
-import aiBotBody from "@public/images/ai-bot/ai-bot-body.png";
 import ResultsTable from "./ResultsTable";
 
 class Results extends Component {
@@ -26,7 +24,19 @@ class Results extends Component {
     setResultsPhase: PropTypes.func
   };
 
+  state = {
+    frame: 0,
+    animationTimer: undefined
+  };
+
   componentDidMount() {
+    const animationTimer = setInterval(
+      this.updateAnimation.bind(this),
+      1000 / 30
+    );
+
+    this.setState({ animationTimer });
+
     this.props.setResultsPhase(0);
     setTimeout(() => {
       this.props.setResultsPhase(1);
@@ -39,22 +49,23 @@ class Results extends Component {
     }, 3000);
   }
 
+  updateAnimation = () => {
+    this.setState({ frame: this.state.frame + 1 });
+  };
+
+  componentWillUnmount = () => {
+    if (this.state.animationTimer) {
+      clearInterval(this.state.animationTimer);
+      this.setState({ animationTimer: undefined });
+    }
+  };
+
   render() {
+    const resultsRowCount = Math.floor(this.state.frame / 40);
+    const showBotReaction = Math.floor(this.state.frame % 40) < 20;
+
     return (
       <div id="results" style={styles.panel}>
-        {this.props.resultsPhase === 0 && (
-          <div style={{ ...styles.trainBot, margin: "0 auto" }}>
-            <img
-              src={aiBotHead}
-              style={{
-                ...styles.trainBotHead,
-                ...(false && styles.trainBotOpen)
-              }}
-            />
-            <img src={aiBotBody} style={styles.trainBotBody} />
-          </div>
-        )}
-
         {this.props.resultsPhase >= 1 &&
           !isNaN(this.props.summaryStat.stat) && (
             <div>
@@ -64,7 +75,9 @@ class Results extends Component {
           )}
 
         {this.props.resultsPhase >= 1 &&
-          !isNaN(this.props.summaryStat.stat) && <ResultsTable />}
+          !isNaN(this.props.summaryStat.stat) && (
+            <ResultsTable rowCount={resultsRowCount} showBotReaction={showBotReaction} />
+          )}
 
         <div style={{ opacity: this.props.resultsPhase >= 2 ? 1 : 0 }}>
           {isNaN(this.props.summaryStat.stat) && (

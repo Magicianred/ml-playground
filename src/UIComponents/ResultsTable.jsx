@@ -9,6 +9,9 @@ import {
   isRegression
 } from "../redux";
 import { styles, colors, ResultsGrades } from "../constants";
+import aiBotYes from "@public/images/ai-bot/ai-bot-yes.png";
+import aiBotNo from "@public/images/ai-bot/ai-bot-no.png";
+import aiBotClosed from "@public/images/ai-bot/ai-bot-closed.png";
 
 class ResultsTable extends Component {
   static propTypes = {
@@ -18,15 +21,41 @@ class ResultsTable extends Component {
     accuracyCheckLabels: PropTypes.array,
     accuracyCheckPredictedLabels: PropTypes.array,
     accuracyGrades: PropTypes.array,
-    isRegression: PropTypes.bool
+    isRegression: PropTypes.bool,
+    rowCount: PropTypes.number,
+    showBotReaction: PropTypes.bool
+  };
+
+  getRows = () => {
+    const totalNumRows = this.props.accuracyCheckExamples.length;
+
+    if (this.props.rowCount < totalNumRows) {
+      // We want to show a subset of the total rows.
+      return this.props.accuracyCheckExamples.slice(0, this.props.rowCount + 1);
+    }
+
+    return this.props.accuracyCheckExamples;
   };
 
   render() {
     const featureCount = this.props.selectedFeatures.length;
+    const lastShownIndex = this.props.rowCount;
+    const botShowYes =
+      this.props.accuracyGrades[lastShownIndex] === ResultsGrades.CORRECT;
+
+    const showNormalBot =
+      this.props.rowCount >= this.props.accuracyCheckExamples.length ||
+      !this.props.showBotReaction;
+
+    const botImage = showNormalBot
+      ? aiBotClosed
+      : botShowYes
+      ? aiBotYes
+      : aiBotNo;
 
     return (
-      <div style={styles.panel}>
-        <div style={styles.tableParent}>
+      <div sstyle={styles.panel} id="results-panel">
+        <div style={{ ...styles.tableParent, float: "left", width: "85%" }}>
           <table style={styles.displayTable}>
             <thead>
               <tr>
@@ -111,7 +140,7 @@ class ResultsTable extends Component {
               </tr>
             </thead>
             <tbody>
-              {this.props.accuracyCheckExamples.map((examples, index) => {
+              {this.getRows().map((examples, index) => {
                 return (
                   <tr key={index}>
                     {examples.map((example, i) => {
@@ -144,6 +173,10 @@ class ResultsTable extends Component {
               })}
             </tbody>
           </table>
+        </div>
+
+        <div style={{ float: "left", width: "15%", textAlign: "right" }}>
+          <img src={botImage} style={{ width: "80%" }} />
         </div>
       </div>
     );
