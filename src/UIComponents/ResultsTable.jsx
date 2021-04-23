@@ -47,10 +47,7 @@ class ResultsTable extends Component {
                     ...styles.resultsTableFirstHeader
                   }}
                 >
-                  <span style={styles.largeText}>{"Actual"}</span>
-                  {this.props.isRegression && (
-                    <div style={styles.smallTextNoMargin}>{"+/- 3% of range"}</div>
-                  )}
+                  <span style={styles.largeText}>{"A.I. Prediction"}</span>
                 </th>
                 <th
                   style={{
@@ -58,7 +55,7 @@ class ResultsTable extends Component {
                     ...styles.resultsTableFirstHeader
                   }}
                 >
-                  <span style={styles.largeText}>{"A.I. Prediction"}</span>
+                  <span style={styles.largeText}>{"A.I. Bot will be correct.."}</span>
                 </th>
                 <th
                   colSpan={featureCount}
@@ -99,15 +96,6 @@ class ResultsTable extends Component {
                     backgroundColor: colors.label,
                     ...styles.resultsTableSecondHeader
                   }}
-                >
-                  {this.props.labelColumn}
-                </th>
-                <th
-                  style={{
-                    ...styles.tableHeader,
-                    backgroundColor: colors.label,
-                    ...styles.resultsTableSecondHeader
-                  }}
                 />
               </tr>
             </thead>
@@ -126,20 +114,18 @@ class ResultsTable extends Component {
                       {this.props.accuracyCheckLabels[index]}
                     </td>
                     <td style={styles.tableCell}>
-                      {this.props.accuracyCheckPredictedLabels[index]}
+                      <select
+                        onChange={console.log("changed")}
+                      >
+                        {["always", "usually", "sometimes", "rarely", "never"].map((option, index) => {
+                          return (
+                            <option key={index} value={option}>
+                              {option}
+                            </option>
+                          );
+                        })}
+                      </select>
                     </td>
-                    {this.props.accuracyGrades[index] ===
-                      ResultsGrades.CORRECT && (
-                      <td style={{ ...styles.ready, ...styles.tableCell }}>
-                        &#x2713;
-                      </td>
-                    )}
-                    {this.props.accuracyGrades[index] ===
-                      ResultsGrades.INCORRECT && (
-                      <td style={{ ...styles.error, ...styles.tableCell }}>
-                        &#10006;
-                      </td>
-                    )}
                   </tr>
                 );
               })}
