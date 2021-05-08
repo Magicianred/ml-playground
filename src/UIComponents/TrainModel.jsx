@@ -8,6 +8,7 @@ import { styles } from "../constants";
 import aiBotHead from "@public/images/ai-bot/ai-bot-head.png";
 import aiBotBody from "@public/images/ai-bot/ai-bot-body.png";
 import labBackground from "@public/images/lab-background-light.png";
+import Statement from "./Statement";
 import DataTable from "./DataTable";
 
 const framesPerCycle = 40;
@@ -67,8 +68,8 @@ class TrainModel extends Component {
   };
 
   render() {
-    const translateX = 15 + this.getAnimationProgess() * (50 - 15);
-    const translateY = 50 - Math.sin(this.getAnimationProgess() * Math.PI) * 30;
+    const translateX = 15 + this.getAnimationProgess() * (100 - 15);
+    const translateY = 80 - Math.sin(this.getAnimationProgess() * Math.PI) * 30;
     const rotateZ = this.getAnimationProgess() * 60;
     const transform = `translateX(-50%) translateY(-50%) rotateZ(${rotateZ}deg)`;
 
@@ -78,41 +79,27 @@ class TrainModel extends Component {
         style={{
           ...styles.panel,
           justifyContent: "center",
-          backgroundImage: "url(" + labBackground + ")",
-          backgroundSize: "cover"
+          backgroundSize: "cover",
+          backgroundImage: "url(" + labBackground + ")"
         }}
       >
-        <div style={styles.statement}>
-          Predict{" "}
-          <span style={styles.statementLabel}>
-            {this.props.labelColumn || "..."}
-          </span>
-          <span>
-            {" "}
-            based on{" "}
-            <span style={styles.statementFeature}>
-              {this.props.selectedFeatures.length > 0
-                ? this.props.selectedFeatures.join(", ")
-                : ".."}
-            </span>
-            {"."}
-          </span>
+        <Statement/>
+
+        <div style={styles.trainModelDataTable}>
+          <DataTable
+            reducedColumns={true}
+            startingRow={this.getAnimationStep()}
+          />
         </div>
 
-        <div style={{ overflow: "hidden", paddingTop: 20 }}>
-          <div style={{ width: "30%", overflow: "hidden", opacity: 0.3 }}>
-            <DataTable
-              reducedColumns={true}
-              startingRow={this.getAnimationStep()}
-            />
-          </div>
+        <div style={styles.trainModelContainer}>
 
           <div
             style={{
               position: "absolute",
+              transformOrigin: "center center",
               top: translateY + "%",
               left: translateX + "%",
-              transformOrigin: "center center",
               transform: transform
             }}
           >
@@ -124,13 +111,7 @@ class TrainModel extends Component {
         </div>
 
         {this.props.readyToTrain && (
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-25%)"
-            }}
-          >
+          <div style={styles.trainModelBotContainer}>
             <div style={{ ...styles.trainBot, margin: "0 auto" }}>
               <img
                 src={aiBotHead}

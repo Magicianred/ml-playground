@@ -52,10 +52,15 @@ class PanelButtons extends Component {
           <div style={styles.previousButton}>
             <button
               type="button"
-              style={styles.navButton}
+              style={{
+                ...styles.navButton,
+                ...(!panelButtons.prev.enabled
+                  ? styles.disabledButton
+                  : undefined)
+              }}
               onClick={this.onClickPrev}
+              disabled={!panelButtons.prev.enabled}
             >
-              &#9664; &nbsp;
               {panelButtons.prev.text}
             </button>
           </div>
@@ -65,11 +70,16 @@ class PanelButtons extends Component {
           <div style={styles.nextButton}>
             <button
               type="button"
-              style={styles.navButton}
+              style={{
+                ...styles.navButton,
+                ...(!panelButtons.next.enabled
+                  ? styles.disabledButton
+                  : undefined)
+              }}
               onClick={this.onClickNext}
+              disabled={!panelButtons.next.enabled}
             >
               {panelButtons.next.text}
-              &nbsp; &#9654;
             </button>
           </div>
         )}
@@ -175,7 +185,7 @@ class App extends Component {
           </BodyContainer>
         )}
 
-        {currentPanel === "selectTrainer" && (
+        {currentPanel === "trainingSettings" && (
           <BodyContainer>
             <ContainerFullWidth>
               <TrainingSettings />

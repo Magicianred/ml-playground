@@ -7,7 +7,8 @@ import {
   setSelectedCSV,
   setSelectedJSON,
   resetState,
-  getSpecifiedDatasets
+  getSpecifiedDatasets,
+  setHighlightDataset
 } from "../redux";
 import { parseCSV } from "../csvReaderWrapper";
 import { parseJSON } from "../jsonReaderWrapper";
@@ -19,11 +20,13 @@ class SelectDataset extends Component {
     setSelectedName: PropTypes.func.isRequired,
     setSelectedCSV: PropTypes.func.isRequired,
     setSelectedJSON: PropTypes.func.isRequired,
+    setHighlightDataset: PropTypes.func.isRequired,
     csvfile: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     jsonfile: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     resetState: PropTypes.func.isRequired,
     specifiedDatasets: PropTypes.arrayOf(PropTypes.string),
-    name: PropTypes.string
+    name: PropTypes.string,
+    highlightDataset: PropTypes.string
   };
 
   constructor(props) {
@@ -37,40 +40,25 @@ class SelectDataset extends Component {
   handleDatasetClick = id => {
     const assetPath = global.__ml_playground_asset_public_path__;
     const dataset = allDatasets.find(dataset => dataset.id === id);
-    const csvPath = assetPath + dataset.path;
-    const jsonPath = assetPath + dataset.metadataPath;
 
-    this.props.resetState();
-    this.props.setSelectedName(dataset.name);
-    this.props.setSelectedCSV(csvPath);
-    this.props.setSelectedJSON(jsonPath);
-    this.setState({
-      download: true
-    });
+    // Don't process the click if we're just clicking the current
+    // dataset again.
+    if (dataset.name !== this.props.name) {
+      const csvPath = assetPath + dataset.path;
+      const jsonPath = assetPath + dataset.metadataPath;
 
-    parseCSV(csvPath, true, false);
+      this.props.resetState();
+      this.props.setSelectedName(dataset.name);
+      this.props.setSelectedCSV(csvPath);
+      this.props.setSelectedJSON(jsonPath);
+      this.setState({
+        download: true
+      });
 
-    parseJSON(jsonPath);
-  };
+      parseCSV(csvPath, true, false);
 
-  handleDatasetSelect = event => {
-    const assetPath = global.__ml_playground_asset_public_path__;
-    const dataset = allDatasets.find(
-      dataset => dataset.id === event.target.value
-    );
-    const csvPath = assetPath + dataset.path;
-    const jsonPath = assetPath + dataset.metadataPath;
-
-    this.props.resetState();
-    this.props.setSelectedCSV(csvPath);
-    this.props.setSelectedJSON(jsonPath);
-    this.setState({
-      download: true
-    });
-
-    parseCSV(csvPath, true, false);
-
-    parseJSON(jsonPath);
+      parseJSON(jsonPath);
+    }
   };
 
   handleUploadSelect = event => {
@@ -100,18 +88,24 @@ class SelectDataset extends Component {
                 <div
                   style={{
                     ...styles.selectDatasetItem,
+                    ...(this.props.highlightDataset === dataset.name &&
+                      styles.selectDatasetItemHighlighted),
                     ...(this.props.name === dataset.name &&
                       styles.selectDatasetItemSelected)
                   }}
                   key={dataset.id}
                   onClick={() => this.handleDatasetClick(dataset.id)}
+                  onMouseEnter={() =>
+                    this.props.setHighlightDataset(dataset.name)
+                  }
+                  onMouseLeave={() => this.props.setHighlightDataset(undefined)}
                 >
                   <img
                     src={assetPath + dataset.imagePath}
                     style={styles.selectDatasetImage}
                     draggable={false}
                   />
-                  <div>{dataset.name}</div>
+                  <div style={styles.selectDatasetText}>{dataset.name}</div>
                 </div>
               );
             })}
@@ -119,22 +113,35 @@ class SelectDataset extends Component {
         </div>
         {!specifiedDatasets && (
           <div style={{ ...styles.contents, marginTop: 20 }}>
-            <div>or import a CSV File</div>
-            <input
-              className="csv-input"
-              type="file"
-              accept=".csv,.xls,.xlsx"
-              ref={input => {
-                this.filesInput = input;
-              }}
-              name="file"
-              placeholder={null}
-              onChange={this.handleUploadSelect}
-            />
-            <p />
-            <button type="button" onClick={this.handleUpload}>
-              Upload
-            </button>
+            <div style={{ float: "left", width: "33.33%" }}>
+              <div style={{ fontSize: 13.33, paddingTop: 4 }}>
+                Or import a CSV file
+              </div>
+            </div>
+            <div
+              style={{ float: "left", width: "33.33%", textAlign: "center" }}
+            >
+              <input
+                className="csv-input"
+                type="file"
+                accept=".csv,.xls,.xlsx"
+                ref={input => {
+                  this.filesInput = input;
+                }}
+                name="file"
+                placeholder={null}
+                onChange={this.handleUploadSelect}
+              />
+            </div>
+            <div style={{ float: "left", width: "33.33%", textAlign: "right" }}>
+              <button
+                type="button"
+                onClick={this.handleUpload}
+                style={styles.uploadButton}
+              >
+                Upload
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -147,7 +154,8 @@ export default connect(
     csvfile: state.csvfile,
     jsonfile: state.jsonfile,
     specifiedDatasets: getSpecifiedDatasets(state),
-    name: state.name
+    name: state.name,
+    highlightDataset: state.highlightDataset
   }),
   dispatch => ({
     resetState() {
@@ -161,6 +169,9 @@ export default connect(
     },
     setSelectedJSON(jsonfilePath) {
       dispatch(setSelectedJSON(jsonfilePath));
+    },
+    setHighlightDataset(id) {
+      dispatch(setHighlightDataset(id));
     }
   })
 )(SelectDataset);

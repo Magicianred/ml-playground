@@ -8,6 +8,8 @@ export const MLTypes = {
   REGRESSION: "regression"
 };
 
+export const REGRESSION_ERROR_TOLERANCE = 5;
+
 export const ResultsGrades = {
   CORRECT: "correct",
   INCORRECT: "incorrect"
@@ -29,13 +31,12 @@ export const saveMessages = {
   name: "Please name your model."
 };
 
-const labelColor = "rgb(254, 96, 3)"; // was 186
-const labelColorSemi = "rgba(254, 96, 3, 0.4)";
+const labelColor = "rgb(254, 96, 3)";
 const featureColor = "rgb(75, 155, 213)";
 
 export const colors = {
-  feature: "rgb(70, 186, 168)",
-  label: "rgb(186, 168, 70)"
+  feature: featureColor,
+  label: labelColor
 };
 
 export const styles = {
@@ -47,6 +48,10 @@ export const styles = {
 
   bold: {
     fontFamily: '"Gotham 5r", sans-serif'
+  },
+
+  italic: {
+    fontFamily: '"Gotham 4i", sans-serif'
   },
 
   error: {
@@ -93,7 +98,7 @@ export const styles = {
   },
 
   mediumText: {
-    fontSize: 18,
+    fontSize: 13,
     marginBottom: 8
   },
 
@@ -102,15 +107,24 @@ export const styles = {
     marginBottom: 8
   },
 
+  smallTextNoMargin: {
+    fontSize: 12
+  },
+
+  footerText: {
+    fontSize: 13,
+    marginTop: 12
+  },
+
   panel: {
-    padding: 20,
-    backgroundColor: "white", // rgb(230,230,230)",
-    borderRadius: 5,
+    padding: 10,
+    backgroundColor: "white",
     overflow: "hidden",
     height: "100%",
     boxSizing: "border-box",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    position: "relative"
   },
 
   popupPanel: {
@@ -127,19 +141,19 @@ export const styles = {
 
   scrollableContentsTinted: {
     overflow: "hidden",
-    borderRadius: 5,
-    backgroundColor: "rgb(206, 206, 206)"
+    borderRadius: 0,
+    backgroundColor: "rgb(206, 206, 206)",
+    padding: 10
   },
 
   scrollingContents: {
-    padding: 15,
-    overflow: "scroll",
+    overflow: "auto",
     height: "100%",
     boxSizing: "border-box"
   },
 
   contents: {
-    borderRadius: 5,
+    borderRadius: 0,
     backgroundColor: "rgb(206, 206, 206)",
     padding: 15
   },
@@ -164,13 +178,12 @@ export const styles = {
     marginLeft: 10,
     width: "calc(30% - 20px)",
     padding: 20,
-    backgroundColor: "white", // rgb(230,230,230)",
-    //border: "solid 1px black",
+    backgroundColor: "white",
     borderRadius: 5,
     fontFamily: '"Gotham 4r", sans-serif',
     fontSize: 18,
     boxSizing: "border-box",
-    overflow: "scroll",
+    overflow: "auto",
     marginTop: 59,
     position: "relative"
   },
@@ -185,16 +198,33 @@ export const styles = {
     float: "left",
     boxSizing: "border-box",
     border: "solid 4px rgba(0,0,0,0)",
-    borderRadius: 10,
-    height: 240
+    borderRadius: 0,
+    height: 220,
+    cursor: "pointer"
+  },
+
+  selectDatasetItemHighlighted: {
+    backgroundColor: "#d6f2fa"
   },
 
   selectDatasetItemSelected: {
-    border: "solid 4px white"
+    backgroundColor: "#94e3fa"
   },
 
   selectDatasetImage: {
     width: "100%"
+  },
+
+  selectDatasetText: {
+    fontSize: 14,
+    marginTop: 10
+  },
+
+  uploadButton: {
+    fontSize: 13.33,
+    padding: "2px 6px",
+    margin: 0,
+    border: "none",
   },
 
   specifyColumnsItem: {
@@ -205,11 +235,12 @@ export const styles = {
   displayTable: {
     whiteSpace: "nowrap",
     borderSpacing: 0,
-    width: "100%"
+    width: "100%",
+    borderCollapse: "collapse"
   },
 
   tableParent: {
-    overflowY: "scroll",
+    overflowY: "auto",
     overflowWrap: "break-word",
     fontSize: 10,
     boxSizing: "border-box",
@@ -221,62 +252,69 @@ export const styles = {
     paddingLeft: 20,
     textAlign: "right",
     position: "sticky",
-    top: 0
+    top: 0,
+    fontSize: 12
   },
 
-  dataDisplayHeaderLabelSelected: {
-    backgroundColor: labelColor,
-    color: "yellow"
-  },
-  dataDisplayHeaderFeatureSelected: {
-    backgroundColor: featureColor,
-    color: "yellow"
-  },
-  dataDisplayHeaderSelected: {
-    color: "yellow",
-    backgroundColor: "black"
-  },
-  dataDisplayHeaderLabelUnselected: {
-    backgroundColor: labelColor,
-    color: "white"
-  },
-  dataDisplayHeaderFeatureUnselected: {
-    backgroundColor: featureColor,
-    color: "white"
-  },
-  dataDisplayHeaderUnselected: {
-    backgroundColor: "black",
-    color: "white"
-  },
-  dataDisplayHeaderHighlighted: {
-    backgroundColor: "#64fff16b",
-    color: "white"
-  },
-  tableCell: {
+  dataDisplayHeader: {
     paddingLeft: 20,
-    textAlign: "right"
+    textAlign: "right",
+    position: "sticky",
+    top: 0,
+    backgroundColor: "white",
+    color: "#4d575f",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "white",
+    padding: 7,
+    fontSize: 14
   },
-  dataDisplayCellLabelSelected: {
-    backgroundColor: labelColorSemi,
-    color: "yellow"
+
+  dataDisplayHeaderLabel: {
+    backgroundColor: labelColor,
+    color: "white"
   },
-  dataDisplayCellFeatureSelected: {
+  dataDisplayHeaderFeature: {
     backgroundColor: featureColor,
-    color: "yellow"
+    color: "white"
+  },
+
+  dataDisplayCell: {
+    padding: 3,
+    paddingLeft: 20,
+    textAlign: "right",
+    fontSize: 12,
+    color: "#4d575f",
+    backgroundColor: "#f2f2f2",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "white"
+  },
+  dataDisplayCellHighlighted: {
+    backgroundColor: "#d6f2fa",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#d6f2fa",
+    cursor: "pointer"
   },
   dataDisplayCellSelected: {
-    color: "yellow",
-    backgroundColor: "grey"
+    backgroundColor: "#94e3fa",
+    borderStyle: "solid",
+    borderWidth: 1,
+    borderColor: "#94e3fa"
   },
-  dataDisplayCellLabelUnselected: {
-    backgroundColor: labelColorSemi
-  },
-  dataDisplayCellFeatureUnselected: {
-    backgroundColor: featureColor
-  },
-  dataDisplayCellUnselected: {},
 
-  dataDisplayCellHighlighted: { backgroundColor: "#64fff16b" },
+  tableCell: {
+    paddingLeft: 20,
+    textAlign: "right",
+    fontSize: 12
+  },
+  dataDisplayCellLabelSelected: {},
+  dataDisplayCellFeatureSelected: {},
+
+  dataDisplayCellLabelUnselected: {},
+  dataDisplayCellFeatureUnselected: {},
+  dataDisplayCellUnselected: {},
 
   crossTabCell0: {
     backgroundColor: "rgba(255,100,100, 0)"
@@ -300,11 +338,14 @@ export const styles = {
   resultsTableFirstHeader: {
     top: 0,
     backgroundColor: "white",
-    color: "rgb(30, 30, 30)"
+    color: "rgb(30, 30, 30)",
+    verticalAlign: "top",
+    height: 45
   },
 
   resultsTableSecondHeader: {
-    top: "30px"
+    top: "47px",
+    color: "white"
   },
 
   previousButton: {
@@ -336,10 +377,8 @@ export const styles = {
   },
 
   statement: {
-    fontSize: 36,
-    backgroundColor: "rgba(255,255,255,0.8)",
-    padding: 10,
-    borderRadius: 5
+    fontSize: 32,
+    paddingBottom: 15
   },
 
   statementLabel: {
@@ -360,6 +399,26 @@ export const styles = {
 
   selectFeaturesText: {
     color: featureColor
+  },
+
+  trainModelContainer: {
+    position: "absolute",
+    overflow: "hidden",
+    paddingTop: 20,
+    width: "calc(50% + 52px)",
+    height: "calc(50% + 66px)",
+    top: 0
+  },
+  trainModelDataTable: {
+    width: "30%",
+    overflow: "hidden",
+    opacity: 0.3,
+    paddingTop: 20
+  },
+  trainModelBotContainer: {
+    position: "absolute",
+    left: "50%",
+    transform: "translateX(-25%)"
   },
 
   trainBot: {
@@ -386,11 +445,13 @@ export const styles = {
   },
 
   cardRow: {
-    marginTop: 5,
-    marginBottom: 5
+    marginTop: 11,
+    marginBottom: 11
   },
 
-  regularButton: { width: "20%" },
+  disabledButton: {
+    opacity: 0.5
+  },
 
   floatLeft: {
     float: "left",
@@ -398,13 +459,20 @@ export const styles = {
   },
 
   phraseBuilder: {
-    fontSize: 24
+    fontSize: 16
   },
 
   phraseBuilderHeader: {
     backgroundColor: "grey",
     color: "white",
     padding: 15
+  },
+
+  phraseBuilderHeaderSecond: {
+    backgroundColor: "grey",
+    color: "white",
+    padding: 15,
+    marginTop: 30
   },
 
   popupClose: {
@@ -423,7 +491,7 @@ export const styles = {
   },
 
   phraseBuilderSelect: {
-    fontSize: 24,
+    fontSize: 16,
     marginTop: 10,
     padding: 6,
     cursor: "pointer",
@@ -431,13 +499,28 @@ export const styles = {
     width: "100%"
   },
 
-  phraseBuilderSelectReadonly: {
-    fontSize: 24,
+  phraseBuilderLabel: {
+    fontSize: 16,
     marginTop: 10,
-    padding: 6,
+    paddingTop: 13,
+    paddingLeft: 13,
+    height: 43,
+    backgroundColor: labelColor,
+    color: "white",
+    boxSizing: "border-box"
   },
 
-  phraseBuilderFeature: { padding: 10, paddingBottom: 0, position: "relative" },
+  phraseBuilderFeature: {
+    fontSize: 16,
+    marginTop: 10,
+    paddingTop: 13,
+    paddingLeft: 13,
+    height: 43,
+    backgroundColor: featureColor,
+    color: "white",
+    boxSizing: "border-box",
+    position: "relative"
+  },
 
   saveInputsWidth: {
     width: "95%"

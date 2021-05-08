@@ -8,7 +8,12 @@ import {
   getAccuracyGrades,
   isRegression
 } from "../redux";
-import { styles, colors, ResultsGrades } from "../constants";
+import {
+  styles,
+  colors,
+  ResultsGrades,
+  REGRESSION_ERROR_TOLERANCE
+} from "../constants";
 import aiBotYes from "@public/images/ai-bot/ai-bot-yes.png";
 import aiBotNo from "@public/images/ai-bot/ai-bot-no.png";
 import aiBotClosed from "@public/images/ai-bot/ai-bot-closed.png";
@@ -62,20 +67,13 @@ class ResultsTable extends Component {
                 <th
                   colSpan={featureCount}
                   style={{
-                    ...styles.largeText,
                     ...styles.tableHeader,
                     ...styles.resultsTableFirstHeader
                   }}
                 >
-                  Features
-                </th>
-                <th
-                  style={{
-                    ...styles.tableHeader,
-                    ...styles.resultsTableFirstHeader
-                  }}
-                >
-                  <span style={styles.largeText}>{"A.I. Prediction"}</span>
+                  <span style={styles.largeText}>
+                    Features
+                  </span>
                 </th>
                 <th
                   style={{
@@ -85,8 +83,18 @@ class ResultsTable extends Component {
                 >
                   <span style={styles.largeText}>{"Actual"}</span>
                   {this.props.isRegression && (
-                    <div style={styles.smallText}>{"+/- 3% of range"}</div>
+                    <div style={styles.smallTextNoMargin}>
+                      {`+/- ${REGRESSION_ERROR_TOLERANCE}% of range`}
+                    </div>
                   )}
+                </th>
+                <th
+                  style={{
+                    ...styles.tableHeader,
+                    ...styles.resultsTableFirstHeader
+                  }}
+                >
+                  <span style={styles.largeText}>{"A.I. Prediction"}</span>
                 </th>
                 <th
                   colSpan={featureCount}
@@ -151,10 +159,10 @@ class ResultsTable extends Component {
                       );
                     })}
                     <td style={styles.tableCell}>
-                      {this.props.accuracyCheckPredictedLabels[index]}
+                      {this.props.accuracyCheckLabels[index]}
                     </td>
                     <td style={styles.tableCell}>
-                      {this.props.accuracyCheckLabels[index]}
+                      {this.props.accuracyCheckPredictedLabels[index]}
                     </td>
                     {this.props.accuracyGrades[index] ===
                       ResultsGrades.CORRECT && (
